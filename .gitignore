@@ -1,0 +1,8 @@
+# Python virtual env
+ryde_interview_test_dimmas/
+
+# Environment variables
+.env
+
+# __pycache__ folders
+__pycache__/

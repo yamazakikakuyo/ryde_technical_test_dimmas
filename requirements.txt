@@ -1,0 +1,7 @@
+fastapi[all]
+motor
+python-dotenv
+uvicorn
+pytest
+pytest-asyncio
+httpx
