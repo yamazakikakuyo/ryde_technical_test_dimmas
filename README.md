@@ -16,7 +16,7 @@ It was created as part of a technical assessment for Full Stack Engineer (Remote
 
 ---
 
-## 🧱 Tech Stack
+## Tech Stack
 
 - **Python 3.11**
 - **FastAPI** – Web framework
@@ -28,7 +28,7 @@ It was created as part of a technical assessment for Full Stack Engineer (Remote
 
 ---
 
-## 📦 Installation
+## Installation
 
 ### 1. Clone the Repository
 
@@ -60,7 +60,7 @@ MONGO_URI=mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/?retryWrites=true&w=
 
 ---
 
-## 🧪 Running the API
+## Running the API
 
 ### Start the development server:
 
@@ -73,7 +73,7 @@ uvicorn app.main:app --reload
 
 ---
 
-## 🧪 Running Tests
+## Running Tests
 
 ```
 pytest
@@ -89,7 +89,7 @@ Tests are written in `tests/test_users.py` and include:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 app/
@@ -105,7 +105,7 @@ tests/
 
 ---
 
-## ✅ API Endpoints
+## API Endpoints
 
 | Method | Endpoint      | Description       |
 | ------ | ------------- | ----------------- |
@@ -117,7 +117,7 @@ tests/
 
 ---
 
-## 💡 Notes
+## Notes
 
 * Uses `python-dotenv` to manage secrets securely.
 * MongoDB Free Tier cluster is sufficient for local development.
@@ -125,7 +125,7 @@ tests/
 
 ---
 
-## 📬 Contact
+## Contact
 
 If you have any questions, feel free to reach out my email **dimmas3010@gmail.com**.
 
