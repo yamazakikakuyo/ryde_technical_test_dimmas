@@ -6,3 +6,7 @@ ryde_interview_test_dimmas/
 
 # __pycache__ folders
 __pycache__/
+
+# Ignore all log files and folders
+logs/
+*.log
