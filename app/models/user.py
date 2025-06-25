@@ -63,15 +63,21 @@ async def update_user(user_id: str, data: dict) -> dict:
     
     if "dob" in data and isinstance(data["dob"], date):
         data["dob"] = datetime.combine(data["dob"], datetime.min.time())
+    
+    if "username" in data and isinstance(data["username"], str):
+        username_check = await get_database_session().get_collection(user_collection_name).find_one({"username": data["username"]})
+        if username_check:
+            logger.error(f"Failed Created User. Username ({data['username']}) already used by other user")
+            return "Duplicate Username"
 
-    await get_database_session().get_collection(user_collection_name).update_one({"_id": user_id}, {"$set": data})
     user = await get_database_session().get_collection(user_collection_name).find_one({"_id": user_id})
     if user:
+        await get_database_session().get_collection(user_collection_name).update_one({"_id": user_id}, {"$set": data})
         logger.info(f"Update User Information with ID {user_id}")
         return user_helper(user)
     else:
         logger.error(f"Failed Update User Information with ID  {user_id}")
-        return None
+        return "No Exist User"
 
 async def delete_user(user_id: str) -> bool:
     """Delete a user by ID."""

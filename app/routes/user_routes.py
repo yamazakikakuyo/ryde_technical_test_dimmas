@@ -36,8 +36,11 @@ async def update_user(user_id: str, user_data: UserUpdate):
     Update an existing user's information.
     """
     updated_user = await user_model.update_user(user_id, user_data.model_dump(exclude_unset=True))
-    if not updated_user:
-        raise HTTPException(status_code=404, detail="User not found")
+    if isinstance(updated_user, str):
+        if updated_user == "Duplicate Username":
+            raise HTTPException(status_code=409, detail="Username duplicate. Try another one.")
+        elif updated_user == "No Exist User":
+            raise HTTPException(status_code=404, detail="User not found")
     return updated_user
 
 # DELETE a user
