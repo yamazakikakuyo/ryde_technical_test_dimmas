@@ -12,6 +12,7 @@ async def test_create_get_update_delete_user():
     
     # Sample user payload for test
     test_user = {
+        "username": "test_user",
         "name": "Test User",
         "dob": "1999-12-31",
         "address": "123 Testing Lane",
@@ -49,6 +50,34 @@ async def test_create_get_update_delete_user():
         # Try to get deleted user
         response = await ac.get(f"/users/{user_id}")
         assert response.status_code == 404
+
+# Test Error Handling for Create User request with taken username
+@pytest.mark.asyncio
+async def test_create_username_duplicate():
+    
+    # Sample user payload for test
+    test_user = {
+        "username": "test_user",
+        "name": "Test User",
+        "dob": "1999-12-31",
+        "address": "123 Testing Lane",
+        "description": "Just a test user",
+        "location": {
+            "type": "Point",
+            "coordinates": [106.8456, -6.2088]
+        }
+    }
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        # Create user
+        response_1 = await ac.post("/users/", json=test_user)
+        user = response_1.json()
+        user_id = user["id"]
+        response_2 = await ac.post("/users/", json=test_user)
+        assert response_2.status_code == 409
+
+        await ac.delete(f"/users/{user_id}")
 
 # Test Error Handling for Create User request with missing fields
 @pytest.mark.asyncio
