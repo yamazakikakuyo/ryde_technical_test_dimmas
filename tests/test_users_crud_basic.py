@@ -53,11 +53,23 @@ async def test_create_get_update_delete_user():
 
 # Test Error Handling for Create User request with taken username
 @pytest.mark.asyncio
-async def test_create_username_duplicate():
+async def test_create_and_update_username_duplicate():
     
     # Sample user payload for test
-    test_user = {
-        "username": "test_user",
+    test_user_1 = {
+        "username": "test_user_1",
+        "name": "Test User",
+        "dob": "1999-12-31",
+        "address": "123 Testing Lane",
+        "description": "Just a test user",
+        "location": {
+            "type": "Point",
+            "coordinates": [106.8456, -6.2088]
+        }
+    }
+
+    test_user_2 = {
+        "username": "test_user_2",
         "name": "Test User",
         "dob": "1999-12-31",
         "address": "123 Testing Lane",
@@ -70,14 +82,26 @@ async def test_create_username_duplicate():
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
-        # Create user
-        response_1 = await ac.post("/users/", json=test_user)
-        user = response_1.json()
-        user_id = user["id"]
-        response_2 = await ac.post("/users/", json=test_user)
+        # Create dummy user for testing
+        response = await ac.post("/users/", json=test_user_1)
+        user = response.json()
+        user_id_1 = user["id"]
+
+        response = await ac.post("/users/", json=test_user_2)
+        user = response.json()
+        user_id_2 = user["id"]
+        
+        # Test error handling for cannot create user with exist username 
+        response_2 = await ac.post("/users/", json=test_user_1)
         assert response_2.status_code == 409
 
-        await ac.delete(f"/users/{user_id}")
+        # Test error handling for cannot update username with exist username
+        updated_data = {"username": "test_user_1"}
+        response_3 = await ac.patch(f"/users/{user_id_2}", json=updated_data)
+        assert response_3.status_code == 404
+
+        await ac.delete(f"/users/{user_id_1}")
+        await ac.delete(f"/users/{user_id_2}")
 
 # Test Error Handling for Create User request with missing fields
 @pytest.mark.asyncio
