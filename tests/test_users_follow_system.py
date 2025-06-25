@@ -12,6 +12,7 @@ async def test_following_and_unfollowing_user():
     
     list_test_user = [
         {
+            "username": "test_user_1",
             "name": "Test User 1",
             "dob": "1999-12-31",
             "address": "123 Testing Lane",
@@ -22,6 +23,7 @@ async def test_following_and_unfollowing_user():
             }
         },
         {
+            "username": "test_user_2",
             "name": "Test User 2",
             "dob": "1999-12-31",
             "address": "123 Testing Lane",
@@ -32,6 +34,7 @@ async def test_following_and_unfollowing_user():
             }
         },
         {
+            "username": "test_user_3",
             "name": "Test User 3",
             "dob": "1999-12-31",
             "address": "123 Testing Lane",
@@ -42,6 +45,7 @@ async def test_following_and_unfollowing_user():
             }
         },
         {
+            "username": "test_user_4",
             "name": "Test User 4",
             "dob": "1999-12-31",
             "address": "123 Testing Lane",
@@ -52,6 +56,7 @@ async def test_following_and_unfollowing_user():
             }
         },
         {
+            "username": "test_user_5",
             "name": "Test User 5",
             "dob": "1999-12-31",
             "address": "123 Testing Lane",
@@ -71,7 +76,6 @@ async def test_following_and_unfollowing_user():
         for test_user in list_test_user:
             response = await ac.post("/users/", json=test_user)
             user = response.json()
-            print(user)
             user_id[test_user['name']] = user["id"]
 
         # Check Follow API Usage
