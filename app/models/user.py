@@ -11,6 +11,7 @@ user_collection_name = "users"
 def user_helper(user) -> dict:
     return {
         "id": str(user.get("_id")),
+        "username": user.get("username"),
         "name": user.get("name"),
         "dob": str(user.get("dob")) if user.get("dob") else None,
         "address": user.get("address"),
@@ -32,11 +33,16 @@ async def create_user(data: dict) -> dict:
     if isinstance(data.get("dob"), date):
         data["dob"] = datetime.combine(data["dob"], datetime.min.time())
 
+    username_check = await get_database_session().get_collection(user_collection_name).find_one({"username": data["username"]})
+    if username_check:
+        logger.error(f"Failed Created User. Username ({data['username']}) already used by other user")
+        return "Duplicate Username"
+
     return_data = user_helper(data)
     for datum in return_data.keys():
         if return_data[datum] == None:
             logger.error("Mandatory User Information Not Complete. Failed to create user.")
-            return None
+            return "Incomplete Data"
     
     await get_database_session().get_collection(user_collection_name).insert_one(data)
     

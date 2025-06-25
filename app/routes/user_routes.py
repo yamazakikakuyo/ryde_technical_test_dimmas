@@ -11,8 +11,11 @@ async def create_user(user: UserCreate):
     Create a new user in the database.
     """
     new_user = await user_model.create_user(user.model_dump())
-    if not new_user:
-        raise HTTPException(status_code=422, detail="User data not completed")
+    if isinstance(new_user, str):
+        if new_user == "Duplicate Username":
+            raise HTTPException(status_code=409, detail="Username duplicate. Try another one.")
+        elif new_user == "Incomplete Data":
+            raise HTTPException(status_code=422, detail="User data not completed")
     return new_user
 
 # GET a single user by ID
