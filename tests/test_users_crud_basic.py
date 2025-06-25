@@ -41,6 +41,8 @@ async def test_create_get_update_delete_user():
         updated_data = {"address": "456 Updated Ave"}
         response = await ac.patch(f"/users/{user_id}", json=updated_data)
         assert response.status_code == 200
+        
+        response = await ac.get(f"/users/{user_id}")
         assert response.json()["address"] == updated_data["address"]
 
         # Delete user
@@ -98,7 +100,7 @@ async def test_create_and_update_username_duplicate():
         # Test error handling for cannot update username with exist username
         updated_data = {"username": "test_user_1"}
         response_3 = await ac.patch(f"/users/{user_id_2}", json=updated_data)
-        assert response_3.status_code == 404
+        assert response_3.status_code == 409
 
         await ac.delete(f"/users/{user_id_1}")
         await ac.delete(f"/users/{user_id_2}")
