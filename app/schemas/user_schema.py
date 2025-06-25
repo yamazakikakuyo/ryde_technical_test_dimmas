@@ -7,6 +7,7 @@ class Location(BaseModel):
     coordinates: List[float] = Field(..., example=[106.8456, -6.2088])  # [longitude, latitude]
 
 class UserBase(BaseModel):
+    username: str = Field(..., example="john_doe")
     name: str = Field(..., example="John Doe")
     dob: date = Field(..., example="1990-01-01")
     address: str = Field(..., example="1234 Main St")
@@ -21,6 +22,7 @@ class UserCreate(UserBase):
 
 class UserUpdate(BaseModel):
     """Schema for updating an existing user."""
+    username: str = Field(None, example="john_doe")
     name: Optional[str] = Field(None, example="John Doe")
     dob: Optional[date] = Field(None, example="1990-01-01")
     address: Optional[str] = Field(None, example="1234 Updated St")
