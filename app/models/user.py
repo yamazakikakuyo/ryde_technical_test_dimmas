@@ -149,10 +149,11 @@ async def get_following(user_id: str) -> list:
     logger.info(f"Get Following of User with ID {user_id}")
     return user.get("following", []) if user else []
 
-async def find_nearby_friends(user_id: str, max_distance_m: int = 1000) -> list:
-    user = await get_database_session().get_collection(user_collection_name).find_one({"_id": user_id})
+# Get nearby user following
+async def find_nearby_friends(username: str, max_distance_m: int = 1000) -> list:
+    user = await get_database_session().get_collection(user_collection_name).find_one({"username": username})
     if not user or "location" not in user:
-        logger.error(f"Failed Get User Information. The user with ID {user_id} is Non-Existance User")
+        logger.error(f"Failed Get User Information. The user with username {username} is Non-Existance User")
         return None
 
     user_coords = user["location"]["coordinates"]
@@ -175,5 +176,5 @@ async def find_nearby_friends(user_id: str, max_distance_m: int = 1000) -> list:
     nearby = []
     async for doc in cursor:
         nearby.append(user_helper(doc))
-    logger.info(f"Get Nearby Following of User with ID {user_id}")
+    logger.info(f"Get Nearby Following of User with ID {username}")
     return nearby

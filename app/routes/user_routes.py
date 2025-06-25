@@ -88,10 +88,10 @@ async def following(user_id: str):
     return {"following": result}
 
 # Get neary by following
-@router.get("/{user_id}/nearby-friends")
-async def get_nearby_friends(user_id: str, distance: int = 1000):
+@router.get("/{username}/nearby-friends")
+async def get_nearby_friends(username: str, distance: int = 1000):
     """
     Return nearby friends (people they follow) within X meters. Default X is 1000
     """
-    nearby = await user_model.find_nearby_friends(user_id, max_distance_m=distance)
+    nearby = await user_model.find_nearby_friends(username, max_distance_m=distance)
     return {"nearby_friends": nearby}
