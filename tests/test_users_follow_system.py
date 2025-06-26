@@ -159,17 +159,226 @@ async def test_following_and_unfollowing_user():
         list_followers = response.json()["followers"]
         assert user_id['Test User 1'] not in list_followers
 
+        # Delete Dummy User as the test case already completede
+        for one_user_id in user_id.keys():
+            response = await ac.delete(f"/users/{user_id[one_user_id]}")
+
+# Test Error Handling of following same user
+@pytest.mark.asyncio
+async def test_following_themself():
+    
+    list_test_user = [
+        {
+            "username": "test_user_1",
+            "name": "Test User 1",
+            "dob": "1999-12-31",
+            "address": "123 Testing Lane",
+            "description": "Just a test user",
+            "location": {
+                "type": "Point",
+                "coordinates": [103.8198,1.3521]
+            }
+        },
+    ]
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        
+        # Create Necessary Dummy User for Test
+        user_id = {}
+        for test_user in list_test_user:
+            response = await ac.post("/users/", json=test_user)
+            user = response.json()
+            user_id[test_user['name']] = user["id"]
+
         # Check Error Handling of following same user
         response = await ac.patch(f"/users/{user_id['Test User 1']}/follow/{user_id['Test User 1']}")
-        assert response.status_code == 400
+        assert response.status_code == 409
+
+        # Delete Dummy User as the test case already completede
+        for one_user_id in user_id.keys():
+            response = await ac.delete(f"/users/{user_id[one_user_id]}")
+
+# Test Error Handling of following where follower non-existance user
+@pytest.mark.asyncio
+async def test_following_non_exist_user():
+    
+    list_test_user = [
+        {
+            "username": "test_user_1",
+            "name": "Test User 1",
+            "dob": "1999-12-31",
+            "address": "123 Testing Lane",
+            "description": "Just a test user",
+            "location": {
+                "type": "Point",
+                "coordinates": [103.8198,1.3521]
+            }
+        },
+    ]
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        
+        # Create Necessary Dummy User for Test
+        user_id = {}
+        for test_user in list_test_user:
+            response = await ac.post("/users/", json=test_user)
+            user = response.json()
+            user_id[test_user['name']] = user["id"]
 
         # Check Error Handling of following where follower non-existance user
         response = await ac.patch(f"/users/123123123/follow/{user_id['Test User 1']}")
         assert response.status_code == 400
 
+        # Delete Dummy User as the test case already completede
+        for one_user_id in user_id.keys():
+            response = await ac.delete(f"/users/{user_id[one_user_id]}")
+
+# Test Error Handling of unfollowing where follower non-existance user
+@pytest.mark.asyncio
+async def test_unfollowing_non_exist_user():
+    
+    list_test_user = [
+        {
+            "username": "test_user_1",
+            "name": "Test User 1",
+            "dob": "1999-12-31",
+            "address": "123 Testing Lane",
+            "description": "Just a test user",
+            "location": {
+                "type": "Point",
+                "coordinates": [103.8198,1.3521]
+            }
+        },
+        {
+            "username": "test_user_2",
+            "name": "Test User 2",
+            "dob": "1999-12-31",
+            "address": "123 Testing Lane",
+            "description": "Just a test user",
+            "location": {
+                "type": "Point",
+                "coordinates": [103.8200,1.3530]
+            }
+        }
+    ]
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        
+        # Create Necessary Dummy User for Test
+        user_id = {}
+        for test_user in list_test_user:
+            response = await ac.post("/users/", json=test_user)
+            user = response.json()
+            user_id[test_user['name']] = user["id"]
+        
+        # Follow user
+        response = await ac.patch(f"/users/{user_id['Test User 1']}/follow/{user_id['Test User 2']}")
+        assert response.status_code == 200
+
         # Check Error Handling of following where target non-existance user
         response = await ac.patch(f"/users/{user_id['Test User 1']}/follow/123123123")
         assert response.status_code == 400
+
+        # Delete Dummy User as the test case already completede
+        for one_user_id in user_id.keys():
+            response = await ac.delete(f"/users/{user_id[one_user_id]}")
+
+# Test Error Handling of following already followed user
+@pytest.mark.asyncio
+async def test_following_already_followed_user():
+    
+    list_test_user = [
+        {
+            "username": "test_user_1",
+            "name": "Test User 1",
+            "dob": "1999-12-31",
+            "address": "123 Testing Lane",
+            "description": "Just a test user",
+            "location": {
+                "type": "Point",
+                "coordinates": [103.8198,1.3521]
+            }
+        },
+        {
+            "username": "test_user_2",
+            "name": "Test User 2",
+            "dob": "1999-12-31",
+            "address": "123 Testing Lane",
+            "description": "Just a test user",
+            "location": {
+                "type": "Point",
+                "coordinates": [103.8200,1.3530]
+            }
+        }
+    ]
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        
+        # Create Necessary Dummy User for Test
+        user_id = {}
+        for test_user in list_test_user:
+            response = await ac.post("/users/", json=test_user)
+            user = response.json()
+            user_id[test_user['name']] = user["id"]
+
+        # Follow user
+        response = await ac.patch(f"/users/{user_id['Test User 1']}/follow/{user_id['Test User 2']}")
+        assert response.status_code == 200
+
+        # Check Error Handling of following already followed user
+        response = await ac.patch(f"/users/{user_id['Test User 1']}/follow/{user_id['Test User 2']}")
+        assert response.status_code == 409
+
+        # Delete Dummy User as the test case already completede
+        for one_user_id in user_id.keys():
+            response = await ac.delete(f"/users/{user_id[one_user_id]}")
+
+# Test Error Handling of unfollowing where unfollowed user
+@pytest.mark.asyncio
+async def test_unfollowing_not_followed_user():
+    
+    list_test_user = [
+        {
+            "username": "test_user_1",
+            "name": "Test User 1",
+            "dob": "1999-12-31",
+            "address": "123 Testing Lane",
+            "description": "Just a test user",
+            "location": {
+                "type": "Point",
+                "coordinates": [103.8198,1.3521]
+            }
+        },
+        {
+            "username": "test_user_2",
+            "name": "Test User 2",
+            "dob": "1999-12-31",
+            "address": "123 Testing Lane",
+            "description": "Just a test user",
+            "location": {
+                "type": "Point",
+                "coordinates": [103.8200,1.3530]
+            }
+        },
+    ]
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        
+        # Create Necessary Dummy User for Test
+        user_id = {}
+        for test_user in list_test_user:
+            response = await ac.post("/users/", json=test_user)
+            user = response.json()
+            user_id[test_user['name']] = user["id"]
+
+        # Check Error Handling of unfollowing where was not following user
+        response = await ac.patch(f"/users/{user_id['Test User 1']}/unfollow/{user_id['Test User 2']}")
+        assert response.status_code == 409
 
         # Delete Dummy User as the test case already completede
         for one_user_id in user_id.keys():
