@@ -8,7 +8,7 @@ router = APIRouter()
 @router.post("/", response_model=UserInDB, status_code=status.HTTP_201_CREATED)
 async def create_user(user: UserCreate):
     """
-    Create a new user in the database.
+    Create a new user in the database. The mandatory fields are Name, Username, Address, Date of Birth (DoB), Description, and Location.
     """
     new_user = await user_model.create_user(user.model_dump())
     if isinstance(new_user, str):
