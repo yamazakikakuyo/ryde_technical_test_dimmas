@@ -1,18 +1,28 @@
 from fastapi import FastAPI, Request
+from contextlib import asynccontextmanager
+
 from app.routes import user_routes
 from app.core.logging_config import logger
 from app.db.mongo import init_db_indexes
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db_indexes()
+    logger.info("MongoDB indexes initialized")
+    yield
+
 app = FastAPI(
     title="Ryde Interview API",
     description="RESTful API for managing users.",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
-@app.on_event("startup")
-async def startup_event():
-    await init_db_indexes()
-    logger.info("MongoDB indexes initialized")
+### Deprecated
+# @app.on_event("startup")
+# async def startup_event():
+#     await init_db_indexes()
+#     logger.info("MongoDB indexes initialized")
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
