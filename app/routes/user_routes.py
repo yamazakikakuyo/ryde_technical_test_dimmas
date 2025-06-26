@@ -33,7 +33,7 @@ async def get_user(user_id: str):
 @router.patch("/{user_id}", response_model=UserInDB)
 async def update_user(user_id: str, user_data: UserUpdate):
     """
-    Update an existing user's information.
+    Update an existing user's information by ID.
     """
     updated_user = await user_model.update_user(user_id, user_data.model_dump(exclude_unset=True))
     if isinstance(updated_user, str):
@@ -65,28 +65,48 @@ async def list_users():
 # Follow another user
 @router.patch("/{user_id}/follow/{target_id}")
 async def follow(user_id: str, target_id: str):
+    """
+    Get user follow another user by perspective ID
+    """
     success = await user_model.follow_user(user_id, target_id)
-    if not success:
-        raise HTTPException(status_code=400, detail="Invalid follower or target ID. Please check your input.")
-    return {"message": f"User {user_id} followed {target_id}"}
+    if isinstance(success, str):
+        if success == "Self Follow":
+            raise HTTPException(status_code=409, detail="Cannot do self-following.")
+        elif success == "No Exist User":
+            raise HTTPException(status_code=400, detail="Invalid follower or target ID. Please check your input.")
+        elif success == "Not Modified":
+            raise HTTPException(status_code=409, detail=f"User {user_id} already followed user with ID {target_id}")
+    return {"message": f"User {user_id} followed user with ID {target_id}"}
 
 # Unfollow a user
 @router.patch("/{user_id}/unfollow/{target_id}")
 async def unfollow(user_id: str, target_id: str):
+    """
+    Get user unfollow another user by perspective ID
+    """
     success = await user_model.unfollow_user(user_id, target_id)
-    if not success:
-        raise HTTPException(status_code=400, detail="Invalid follower or target ID. Please check your input.")
-    return {"message": f"User {user_id} unfollowed {target_id}"}
+    if isinstance(success, str):
+        if success == "No Exist User":
+            raise HTTPException(status_code=400, detail="Invalid follower or target ID. Please check your input.")
+        elif success == "Not Modified":
+            raise HTTPException(status_code=409, detail=f"User {user_id} wasn't following user with ID {target_id}")
+    return {"message": f"User {user_id} unfollowed user with ID {target_id}"}
 
 # Get followers
 @router.get("/{user_id}/followers")
 async def followers(user_id: str):
+    """
+    Get the list of follower by ID  
+    """
     result = await user_model.get_followers(user_id)
     return {"followers": result}
 
 # Get following
 @router.get("/{user_id}/following")
 async def following(user_id: str):
+    """
+    Get the list of following by ID  
+    """
     result = await user_model.get_following(user_id)
     return {"following": result}
 
@@ -94,7 +114,7 @@ async def following(user_id: str):
 @router.get("/{username}/nearby-friends")
 async def get_nearby_friends(username: str, distance: int = 1000):
     """
-    Return nearby friends (people they follow) within X meters. Default X is 1000
+    Return nearby friends (people they follow) by Username within X meters. Default X is 1000
     """
     nearby = await user_model.find_nearby_friends(username, max_distance_m=distance)
     return {"nearby_friends": nearby}

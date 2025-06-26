@@ -100,48 +100,67 @@ async def list_users() -> list:
 # Follow another user
 async def follow_user(follower_id: str, target_id: str) -> bool:
     if follower_id == target_id:
-        logger.error(f"Failed Follow. User with ID {follower_id} tried follow themself.")
-        return False  # Prevent self-follow
+        logger.error(f"Failed Follow. User with ID {follower_id} tried self-follow.")
+        return "Self Follow"  # Prevent self-follow
     
+    # Check if both user is existing
     follower_user = await get_database_session().get_collection(user_collection_name).find_one({"_id": follower_id})
     target_user = await get_database_session().get_collection(user_collection_name).find_one({"_id": target_id})
     
     if follower_user is None or target_user is None:
         logger.error(f"Failed Follow. Either or both of Follower or Target User is non-existance.")
-        return False # Prevent non-existance User
+        return "No Exist User" # Prevent non-existance User
 
     # Update 'following' of follower
-    await get_database_session().get_collection(user_collection_name).update_one(
+    result_1 = await get_database_session().get_collection(user_collection_name).update_one(
         {"_id": follower_id},
         {"$addToSet": {"following": target_id}}
     )
     # Update 'followers' of target
-    await get_database_session().get_collection(user_collection_name).update_one(
+    result_2 = await get_database_session().get_collection(user_collection_name).update_one(
         {"_id": target_id},
         {"$addToSet": {"followers": follower_id}}
     )
-    logger.info(f"User with ID {follower_id} followed user with ID {target_id}")
-    return True
+    
+    # Give warning of already followed
+    if result_1.modified_count == 0 and result_2.modified_count == 0:
+        logger.warning(f"User with ID {follower_id} already followed user with ID {target_id}")
+        return "Not Modified"
+    # Return success
+    else:
+        logger.info(f"User with ID {follower_id} followed user with ID {target_id}")
+        return True
 
 # Unfollow a user
 async def unfollow_user(follower_id: str, target_id: str) -> bool:
+    # Check if both user is existing
     follower_user = await get_database_session().get_collection(user_collection_name).find_one({"_id": follower_id})
     target_user = await get_database_session().get_collection(user_collection_name).find_one({"_id": target_id})
     
     if follower_user is None or target_user is None:
         logger.error(f"Failed Follow. Either or both of Follower or Target User is non-existance.")
-        return False # Prevent non-existance User
+        return "No Exist User" # Prevent non-existance User
 
-    await get_database_session().get_collection(user_collection_name).update_one(
+    # Update 'following' of target
+    result_1 = await get_database_session().get_collection(user_collection_name).update_one(
         {"_id": follower_id},
         {"$pull": {"following": target_id}}
     )
-    await get_database_session().get_collection(user_collection_name).update_one(
+
+    # Update 'followers' of target
+    result_2 = await get_database_session().get_collection(user_collection_name).update_one(
         {"_id": target_id},
         {"$pull": {"followers": follower_id}}
     )
-    logger.info(f"User with ID {follower_id} unfollowed user with ID {target_id}")
-    return True
+
+    # Give warning of wasn't following
+    if result_1.modified_count == 0 and result_2.modified_count == 0:
+        logger.warning(f"User with ID {follower_id} wasn't following user with ID {target_id}")
+        return "Not Modified"
+    # Return success
+    else:
+        logger.info(f"User with ID {follower_id} unfollowed user with ID {target_id}")
+        return True
 
 # Get followers of a user
 async def get_followers(user_id: str) -> list:
