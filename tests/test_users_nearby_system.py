@@ -112,4 +112,4 @@ async def test_nearby_user():
 
         # Delete Dummy User as the test case already completede
         for one_user_id in user_id.keys():
-            response = await ac.delete(f"/users/{user_id[one_user_id]}")
+            response = await ac.delete(f"/users/{user_id[one_user_id]['id']}")
