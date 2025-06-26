@@ -12,8 +12,6 @@ class UserBase(BaseModel):
     dob: date = Field(...,json_schema_extra={"example": "1990-01-01"})
     address: str = Field(...,json_schema_extra={"example": "1234 Main St"})
     description: str = Field(...,json_schema_extra={"example": "A sample user"})
-    followers: List[str] = Field(default_factory=list,json_schema_extra={"example": ["1", "2", "3"]})
-    following: List[str] = Field(default_factory=list,json_schema_extra={"example": ["4", "5", "6"]})
     location: Location = Field(...,json_schema_extra={"example": {"type": "Point", "coordinates": [106.8456, -6.2088]}})
 
 class UserCreate(UserBase):
@@ -34,7 +32,9 @@ class UserUpdate(BaseModel):
 class UserInDB(UserBase):
     id: str
     createdAt: str
-
+    followers: List[str]
+    following: List[str]
+    
     model_config = {
         "from_attributes": True
     }
