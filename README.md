@@ -20,13 +20,16 @@ It was created as part of a technical assessment for Full Stack Engineer (Remote
 
 ## Tech Stack
 
-- **Python 3.11** - Programming Environment
+- **Windows 10** - System Operation
+- **Python 3.11** - Programming Language Environment
 - **MongoDB Atlas** – Cloud database
 - **FastAPI** – Web framework (0.115.13)
 - **Motor** – Async MongoDB driver (3.7.1)
 - **Pydantic** – Data validation (2.11.7)
 - **Uvicorn** – ASGI server (0.34.3)
-- **pytest** – Testing framework (8.4.1)
+- **PyTest** – Testing framework (8.4.1)
+
+for more detail about the used python library, please refers to requirements.txt 
 
 ---
 
@@ -101,10 +104,16 @@ uvicorn app.main:app --reload
 ---
 
 ## Running Tests
-To run test case, just use command below:
+To run ALL test case, just use command below:
 ```
 pytest
 ```
+or if you want to test seperately (per files), you can use command below:
+```
+pytest tests\<file_name>.py
+```
+
+Feel free to add argument `-o log_cli=true` to see more detail and logging which happen during testing. 
 
 All test scripts are written in `tests/*.py` and include test case like below:
 
